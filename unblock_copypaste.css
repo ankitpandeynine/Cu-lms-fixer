@@ -1,0 +1,71 @@
+/**
+ * CU LMS Fixer - Global Text Selection & Copy-Paste Stylesheet
+ * Ensures all text on CUIMS, LMS, and subsidiary portals is selectable and copyable.
+ */
+
+/* Universal text selection enable when not disabled in settings */
+html:not([data-cu-unblock-copypaste="false"]) *,
+html:not([data-cu-unblock-copypaste="false"]) *::before,
+html:not([data-cu-unblock-copypaste="false"]) *::after {
+  -webkit-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -ms-user-select: auto !important;
+  user-select: auto !important;
+  -webkit-touch-callout: default !important;
+  -webkit-user-drag: auto !important;
+}
+
+/* Explicit text element selection rules */
+html:not([data-cu-unblock-copypaste="false"]) body,
+html:not([data-cu-unblock-copypaste="false"]) p,
+html:not([data-cu-unblock-copypaste="false"]) span,
+html:not([data-cu-unblock-copypaste="false"]) div,
+html:not([data-cu-unblock-copypaste="false"]) h1,
+html:not([data-cu-unblock-copypaste="false"]) h2,
+html:not([data-cu-unblock-copypaste="false"]) h3,
+html:not([data-cu-unblock-copypaste="false"]) h4,
+html:not([data-cu-unblock-copypaste="false"]) h5,
+html:not([data-cu-unblock-copypaste="false"]) h6,
+html:not([data-cu-unblock-copypaste="false"]) pre,
+html:not([data-cu-unblock-copypaste="false"]) code,
+html:not([data-cu-unblock-copypaste="false"]) table,
+html:not([data-cu-unblock-copypaste="false"]) tr,
+html:not([data-cu-unblock-copypaste="false"]) td,
+html:not([data-cu-unblock-copypaste="false"]) th,
+html:not([data-cu-unblock-copypaste="false"]) li,
+html:not([data-cu-unblock-copypaste="false"]) a,
+html:not([data-cu-unblock-copypaste="false"]) blockquote,
+html:not([data-cu-unblock-copypaste="false"]) label,
+html:not([data-cu-unblock-copypaste="false"]) section,
+html:not([data-cu-unblock-copypaste="false"]) article,
+html:not([data-cu-unblock-copypaste="false"]) main,
+html:not([data-cu-unblock-copypaste="false"]) aside {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Ensure inputs, textareas, and contenteditable elements are always interactive & accept paste */
+html:not([data-cu-unblock-copypaste="false"]) input,
+html:not([data-cu-unblock-copypaste="false"]) textarea,
+html:not([data-cu-unblock-copypaste="false"]) [contenteditable="true"] {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  cursor: text !important;
+  pointer-events: auto !important;
+}
+
+/* Neutralize common CSS anti-copy / unselectable helper classes */
+html:not([data-cu-unblock-copypaste="false"]) .no-copy,
+html:not([data-cu-unblock-copypaste="false"]) .unselectable,
+html:not([data-cu-unblock-copypaste="false"]) .noselect,
+html:not([data-cu-unblock-copypaste="false"]) .disable-select,
+html:not([data-cu-unblock-copypaste="false"]) .no-select,
+html:not([data-cu-unblock-copypaste="false"]) [unselectable="on"] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+  pointer-events: auto !important;
+}

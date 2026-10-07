@@ -1,0 +1,76 @@
+/*
+ * CSS rules for students.cuchd.in and uims.cuchd.in
+ * Automatically suppresses forced home page popups (e.g. #divForcePopUp, #div_libpopup),
+ * compulsory feedback overlays, and "Today's Highlight" landing page slideshows.
+ */
+
+/* Elements explicitly marked as hidden by content script */
+[data-cu-overlay-hidden="true"],
+[data-cu-feedback-hidden="true"],
+[data-cu-slideshow-hidden="true"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* Prevent flash of known forced home page overlays on page load when setting is enabled */
+html[data-cu-hide-students-overlay="true"] #divForcePopUp,
+html[data-cu-hide-students-overlay="true"] #div_libpopup,
+html[data-cu-hide-students-overlay="true"] .modal[id*="ForcePop"],
+html[data-cu-hide-students-overlay="true"] .modal[id*="forcepopup" i],
+html[data-cu-hide-students-overlay="true"] .modal[id*="libpopup" i] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* Prevent flash and hide Today's Highlight slideshow & carousel */
+html[data-cu-hide-landing-slideshow="true"] [id*="Highlight" i],
+html[data-cu-hide-landing-slideshow="true"] [id*="highlight" i],
+html[data-cu-hide-landing-slideshow="true"] [class*="Highlight" i],
+html[data-cu-hide-landing-slideshow="true"] [class*="highlight" i],
+html[data-cu-hide-landing-slideshow="true"] #carousel-example-generic,
+html[data-cu-hide-landing-slideshow="true"] #myCarousel,
+html[data-cu-hide-landing-slideshow="true"] .carousel-indicators,
+html[data-cu-hide-landing-slideshow="true"] .carousel-inner {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* On LandingPage.aspx, hide carousel banners and highlight graphics */
+html[data-cu-hide-landing-slideshow="true"][data-cu-is-landing-page="true"] .carousel,
+html[data-cu-hide-landing-slideshow="true"][data-cu-is-landing-page="true"] [id*="carousel" i],
+html[data-cu-hide-landing-slideshow="true"][data-cu-is-landing-page="true"] [class*="carousel" i],
+html[data-cu-hide-landing-slideshow="true"][data-cu-is-landing-page="true"] [id*="slider" i],
+html[data-cu-hide-landing-slideshow="true"][data-cu-is-landing-page="true"] .slider,
+html[data-cu-hide-landing-slideshow="true"][data-cu-is-landing-page="true"] .slideshow {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* Sleek indicator when auto-skipping landing page */
+.cu-landing-skip-notice {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 999999;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}

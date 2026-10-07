@@ -13,19 +13,64 @@
         <img src="icons/icon-32.png" alt="CU LMS Logo" class="app-icon">
         <div>
           <h1 class="title">CU LMS Fixer</h1>
-          <p class="subtitle">Feature Configuration</p>
+          <p class="subtitle">Feature & AI Suite</p>
         </div>
       </div>
-      <span class="version-badge">v1.4.0</span>
+      <span class="version-badge">v1.8.0</span>
     </header>
 
-    <main class="settings-list">
+    <!-- iOS 27 Inspired Glassmorphism Segmented Tab Bar -->
+    <div class="ios-tab-bar" role="tablist">
+      <button type="button" class="ios-tab-btn active" id="tabBtnHome" role="tab" aria-selected="true">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+        </svg>
+        <span>Home</span>
+      </button>
+      <button type="button" class="ios-tab-btn" id="tabBtnAi" role="tab" aria-selected="false">
+        <svg class="tab-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+        </svg>
+        <span>AI Engines</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: HOME PAGE (Top 2 AI Toggles + LMS Controls) -->
+    <main class="settings-list tab-content active" id="tabContentHome">
+      <div class="section-title">⚡ Quiz Auto-Solver Controls</div>
+
+      <label class="setting-item" for="enableQuizSolver">
+        <div class="setting-info">
+          <span class="setting-name">Enable Quiz Auto-Solver UI</span>
+          <span class="setting-desc">Injects floating smart solver widget into test pages</span>
+        </div>
+        <input type="checkbox" id="enableQuizSolver" class="setting-checkbox">
+      </label>
+
+      <label class="setting-item" for="enableAutoProceed">
+        <div class="setting-info">
+          <span class="setting-name">Auto-Solve & Auto-Submit</span>
+          <span class="setting-desc">Auto marks each answer, clicks Next until final Submit</span>
+        </div>
+        <input type="checkbox" id="enableAutoProceed" class="setting-checkbox">
+      </label>
+
+      <div class="section-title">Copy & Paste Protection</div>
+
+      <label class="setting-item" for="enableUnblockCopyPaste">
+        <div class="setting-info">
+          <span class="setting-name">Unblock Copy & Paste everywhere</span>
+          <span class="setting-desc">Stops CUIMS & LMS from blocking copy, paste, and text selection</span>
+        </div>
+        <input type="checkbox" id="enableUnblockCopyPaste" class="setting-checkbox">
+      </label>
+
       <div class="section-title">Course Features</div>
 
       <label class="setting-item" for="enableDownloadButton">
         <div class="setting-info">
           <span class="setting-name">Enable download button</span>
-          <span class="setting-desc">Adds direct download buttons to Moodle file resources</span>
+          <span class="setting-desc">Adds direct download buttons to PDF, PPT, and files</span>
         </div>
         <input type="checkbox" id="enableDownloadButton" class="setting-checkbox">
       </label>
@@ -33,9 +78,17 @@
       <label class="setting-item" for="enableCopyButton">
         <div class="setting-info">
           <span class="setting-name">Enable copy button</span>
-          <span class="setting-desc">Adds one-click text copy buttons to reading pages</span>
+          <span class="setting-desc">Adds 1-click text copying for reading materials</span>
         </div>
         <input type="checkbox" id="enableCopyButton" class="setting-checkbox">
+      </label>
+
+      <label class="setting-item" for="enableSectionDownloadAll">
+        <div class="setting-info">
+          <span class="setting-name">Enable batch download</span>
+          <span class="setting-desc">Adds "Download All" button to section headers</span>
+        </div>
+        <input type="checkbox" id="enableSectionDownloadAll" class="setting-checkbox">
       </label>
 
       <div class="section-title">AI / SOP Popup Controls</div>
@@ -55,6 +108,127 @@
         </div>
         <input type="checkbox" id="disableAutoSopPopup" class="setting-checkbox">
       </label>
+
+      <div class="section-title">Student Portal (students.cuchd.in)</div>
+
+      <label class="setting-item" for="hideStudentsOverlay">
+        <div class="setting-info">
+          <span class="setting-name">Hide home page overlays & popups</span>
+          <span class="setting-desc">Blocks forced announcements, notice popups, and survey overlays</span>
+        </div>
+        <input type="checkbox" id="hideStudentsOverlay" class="setting-checkbox">
+      </label>
+
+      <label class="setting-item" for="hideLandingSlideshow">
+        <div class="setting-info">
+          <span class="setting-name">Hide slideshow & skip landing page</span>
+          <span class="setting-desc">Hides "Today's Highlight" slideshow and auto-proceeds to Home</span>
+        </div>
+        <input type="checkbox" id="hideLandingSlideshow" class="setting-checkbox">
+      </label>
+    </main>
+
+    <!-- TAB 2: AI ENGINE & API SETUP -->
+    <main class="settings-list tab-content" id="tabContentAi" style="display: none;">
+      <div class="section-title">🤖 Active AI Engine</div>
+
+      <div class="setting-item" style="padding: 8px 10px;">
+        <div class="setting-info">
+          <span class="setting-name">Select Primary Provider</span>
+          <span class="setting-desc">Switch between Gemini, Grok, NVIDIA, OpenRouter</span>
+        </div>
+        <select id="quizProviderSelect" class="styled-popup-select">
+          <option value="gemini">Google Gemini</option>
+          <option value="grok">xAI Grok</option>
+          <option value="nvidia">NVIDIA NIM</option>
+          <option value="openrouter">OpenRouter AI</option>
+          <option value="lm_studio">Local LM Studio</option>
+        </select>
+      </div>
+
+      <!-- Gemini Config Block -->
+      <div id="providerBlockGemini" class="provider-config-block">
+        <div class="section-title">Google Gemini Settings</div>
+        <div class="setting-item" style="padding: 6px 10px;">
+          <div class="setting-info">
+            <span class="setting-name">Gemini Model</span>
+            <span class="setting-desc">Fast zero-demand-spike models</span>
+          </div>
+          <select id="geminiModelSelect" class="styled-popup-select">
+            <option value="gemini-2.5-flash">gemini-2.5-flash (Fast & Accurate)</option>
+            <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Ultra Fast)</option>
+            <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+          </select>
+        </div>
+        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 4px; padding: 6px 10px;">
+          <span class="setting-name">Gemini API Key</span>
+          <span class="setting-desc">Optional override (uses .env if blank)</span>
+          <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy..." class="styled-popup-input">
+        </div>
+      </div>
+
+      <!-- Grok Config Block -->
+      <div id="providerBlockGrok" class="provider-config-block" style="display: none;">
+        <div class="section-title">xAI Grok Settings</div>
+        <div class="setting-item" style="padding: 6px 10px;">
+          <div class="setting-info">
+            <span class="setting-name">Grok Model</span>
+            <span class="setting-desc">xAI LLM model identifier</span>
+          </div>
+          <select id="grokModelSelect" class="styled-popup-select">
+            <option value="grok-beta">grok-beta</option>
+            <option value="grok-2">grok-2</option>
+            <option value="grok-2-mini">grok-2-mini</option>
+          </select>
+        </div>
+        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 4px; padding: 6px 10px;">
+          <span class="setting-name">Grok API Key</span>
+          <span class="setting-desc">Optional override (uses .env if blank)</span>
+          <input type="password" id="grokApiKeyInput" placeholder="xai-..." class="styled-popup-input">
+        </div>
+      </div>
+
+      <!-- NVIDIA Config Block -->
+      <div id="providerBlockNvidia" class="provider-config-block" style="display: none;">
+        <div class="section-title">NVIDIA NIM Settings</div>
+        <div class="setting-item" style="padding: 6px 10px;">
+          <div class="setting-info">
+            <span class="setting-name">NVIDIA NIM Model</span>
+            <span class="setting-desc">build.nvidia.com catalog model</span>
+          </div>
+          <select id="nvidiaModelSelect" class="styled-popup-select">
+            <option value="meta/llama-3.1-70b-instruct">meta/llama-3.1-70b-instruct</option>
+            <option value="meta/llama-3.1-8b-instruct">meta/llama-3.1-8b-instruct</option>
+            <option value="mistralai/mixtral-8x7b-instruct-v0.1">mistralai/mixtral-8x7b-instruct</option>
+          </select>
+        </div>
+        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 4px; padding: 6px 10px;">
+          <span class="setting-name">NVIDIA API Key</span>
+          <span class="setting-desc">Optional override (uses .env if blank)</span>
+          <input type="password" id="nvidiaApiKeyInput" placeholder="nvapi-..." class="styled-popup-input">
+        </div>
+      </div>
+
+      <!-- OpenRouter Config Block -->
+      <div id="providerBlockOpenrouter" class="provider-config-block" style="display: none;">
+        <div class="section-title">OpenRouter AI Settings</div>
+        <div class="setting-item" style="padding: 6px 10px;">
+          <div class="setting-info">
+            <span class="setting-name">OpenRouter Model</span>
+            <span class="setting-desc">OpenRouter unified model ID</span>
+          </div>
+          <select id="openrouterModelSelect" class="styled-popup-select">
+            <option value="meta-llama/llama-3.3-70b-instruct:free">meta-llama/llama-3.3-70b-instruct:free</option>
+            <option value="google/gemini-2.0-flash-lite-001">google/gemini-2.0-flash-lite-001</option>
+            <option value="deepseek/deepseek-chat">deepseek/deepseek-chat</option>
+          </select>
+        </div>
+        <div class="setting-item" style="flex-direction: column; align-items: stretch; gap: 4px; padding: 6px 10px;">
+          <span class="setting-name">OpenRouter API Key</span>
+          <span class="setting-desc">Optional override (uses .env if blank)</span>
+          <input type="password" id="openrouterApiKeyInput" placeholder="sk-or-..." class="styled-popup-input">
+        </div>
+      </div>
     </main>
 
     <footer class="footer">

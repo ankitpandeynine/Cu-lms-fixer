@@ -1,10 +1,17 @@
 {
   "manifest_version": 3,
   "name": "CU-LMS Fixer",
-  "version": "1.4.0",
-  "description": "Adds one-click download buttons to file resources, copy buttons to reading pages, and customizable SOP popup controls on CU LMS.",
+  "version": "1.7.0",
+  "description": "Unblock copy & paste everywhere, one-click PDF/PPT downloads, section batch downloads, and popup controls across CU LMS, CUIMS, and portals.",
   "permissions": ["downloads", "clipboardWrite", "storage"],
-  "host_permissions": ["https://lms.cuchd.in/*"],
+  "host_permissions": [
+    "*://*.cuchd.in/*",
+    "*://*.cuims.in/*",
+    "*://*.cuidol.in/*",
+    "*://*.onlinecu.in/*",
+    "*://*.culko.in/*",
+    "*://*.chandigarhuniversity.ac.in/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -25,10 +32,65 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://lms.cuchd.in/*"],
+      "matches": [
+        "*://*.cuchd.in/*",
+        "*://*.cuims.in/*",
+        "*://*.cuidol.in/*",
+        "*://*.onlinecu.in/*",
+        "*://*.culko.in/*",
+        "*://*.chandigarhuniversity.ac.in/*"
+      ],
+      "js": ["unblock_copypaste_main.js"],
+      "world": "MAIN",
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "*://*.cuchd.in/*",
+        "*://*.cuims.in/*",
+        "*://*.cuidol.in/*",
+        "*://*.onlinecu.in/*",
+        "*://*.culko.in/*",
+        "*://*.chandigarhuniversity.ac.in/*"
+      ],
+      "js": ["unblock_copypaste.js"],
+      "css": ["unblock_copypaste.css"],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "https://lms.cuchd.in/*",
+        "*://culms.cuidol.in/*",
+        "*://lms.culko.in/*"
+      ],
       "js": ["content.js"],
       "css": ["content.css"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://students.cuchd.in/*",
+        "https://uims.cuchd.in/*",
+        "*://*.cuims.in/*"
+      ],
+      "js": ["content_students.js"],
+      "css": ["content_students.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["unblock_copypaste_main.js"],
+      "matches": [
+        "*://*.cuchd.in/*",
+        "*://*.cuims.in/*",
+        "*://*.cuidol.in/*",
+        "*://*.onlinecu.in/*",
+        "*://*.culko.in/*",
+        "*://*.chandigarhuniversity.ac.in/*"
+      ]
     }
   ]
 }

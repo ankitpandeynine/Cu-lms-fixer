@@ -1,35 +1,298 @@
+/* ==========================================================================
+   CU LMS Fixer & Downloader - Modern Design System & Styles
+   ========================================================================== */
+
+:root {
+  --cu-primary: #bd1017;
+  --cu-primary-hover: #960c12;
+  --cu-primary-active: #7a090e;
+  --cu-primary-light: rgba(189, 16, 23, 0.08);
+  --cu-primary-border: rgba(189, 16, 23, 0.25);
+  --cu-success: #15803d;
+  --cu-success-hover: #166534;
+  --cu-success-light: rgba(21, 128, 61, 0.1);
+  --cu-text-dark: #1e293b;
+  --cu-text-muted: #64748b;
+  --cu-border: #e2e8f0;
+  --cu-surface: #ffffff;
+  --cu-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --cu-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --cu-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --cu-radius-sm: 6px;
+  --cu-radius-md: 8px;
+  --cu-radius-lg: 12px;
+  --cu-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Individual Download & Copy Buttons in Course List */
 .cu-lms-download-button,
 .cu-lms-copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   position: relative;
   z-index: 3;
-  align-self: flex-start;
-  margin: 0.45rem 0 0.1rem;
-  padding: 0.22rem 0.58rem;
-  border: 1px solid #bd1017;
-  border-radius: 0.3rem;
-  background: #bd1017;
-  color: #fff;
-  font: inherit;
-  font-size: 0.8rem;
-  line-height: 1.3;
+  margin: 0.35rem 0.4rem 0.15rem 0;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--cu-primary);
+  border-radius: var(--cu-radius-sm);
+  background: var(--cu-primary);
+  color: #ffffff !important;
+  font-family: var(--cu-font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-decoration: none !important;
   cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-shadow: var(--cu-shadow-sm);
+}
+
+.cu-lms-copy-button {
+  background: #ffffff;
+  color: var(--cu-primary) !important;
+  border-color: var(--cu-primary);
 }
 
 .cu-lms-download-button:hover:not(:disabled),
-.cu-lms-download-button:focus-visible:not(:disabled),
+.cu-lms-download-button:focus-visible:not(:disabled) {
+  background: var(--cu-primary-hover);
+  border-color: var(--cu-primary-hover);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: var(--cu-shadow-md);
+}
+
 .cu-lms-copy-button:hover:not(:disabled),
 .cu-lms-copy-button:focus-visible:not(:disabled) {
-  background: #8f0c11;
-  border-color: #8f0c11;
-  color: #fff;
-  outline: 2px solid #fff;
-  outline-offset: 2px;
+  background: var(--cu-primary-light);
+  border-color: var(--cu-primary-hover);
+  color: var(--cu-primary-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--cu-shadow-md);
 }
 
 .cu-lms-download-button:disabled,
 .cu-lms-copy-button:disabled {
-  cursor: progress;
-  opacity: 0.72;
+  cursor: wait;
+  opacity: 0.75;
+  transform: none !important;
+}
+
+.cu-lms-download-button.cu-success,
+.cu-lms-copy-button.cu-success {
+  background: var(--cu-success) !important;
+  border-color: var(--cu-success) !important;
+  color: #ffffff !important;
+}
+
+/* Button SVG icons */
+.cu-btn-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  fill: currentColor;
+}
+
+/* Section-level "Download All (PDF & PPT)" Button */
+.cu-lms-section-batch-container {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.75rem;
+  vertical-align: middle;
+}
+
+.cu-lms-batch-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--cu-border);
+  border-radius: var(--cu-radius-md);
+  background: #ffffff;
+  color: var(--cu-text-dark);
+  font-family: var(--cu-font-sans);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--cu-shadow-sm);
+  transition: all 0.15s ease-in-out;
+}
+
+.cu-lms-batch-download-btn:hover:not(:disabled) {
+  border-color: var(--cu-primary);
+  color: var(--cu-primary);
+  background: var(--cu-primary-light);
+  box-shadow: var(--cu-shadow-md);
+  transform: translateY(-1px);
+}
+
+.cu-lms-batch-download-btn:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.cu-lms-badge {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  background: var(--cu-primary);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Top Sticky Action Bar on /mod/resource/view.php & /mod/page/view.php */
+.cu-lms-page-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0 1.25rem 0;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border: 1px solid var(--cu-border);
+  border-left: 4px solid var(--cu-primary);
+  border-radius: var(--cu-radius-md);
+  box-shadow: var(--cu-shadow-sm);
+  font-family: var(--cu-font-sans);
+  z-index: 100;
+}
+
+.cu-lms-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.cu-lms-file-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--cu-primary-light);
+  color: var(--cu-primary);
+  border: 1px solid var(--cu-primary-border);
+  border-radius: var(--cu-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.cu-lms-bar-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--cu-text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 450px;
+}
+
+.cu-lms-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.cu-lms-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--cu-radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  border: none;
+}
+
+.cu-lms-bar-btn-primary {
+  background: var(--cu-primary);
+  color: #ffffff !important;
+  box-shadow: var(--cu-shadow-sm);
+}
+
+.cu-lms-bar-btn-primary:hover:not(:disabled) {
+  background: var(--cu-primary-hover);
+  box-shadow: var(--cu-shadow-md);
+  transform: translateY(-1px);
+}
+
+.cu-lms-bar-btn-secondary {
+  background: #ffffff;
+  color: var(--cu-text-dark) !important;
+  border: 1px solid var(--cu-border);
+}
+
+.cu-lms-bar-btn-secondary:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.cu-lms-bar-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Toast notifications */
+.cu-lms-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.1rem;
+  background: #1e293b;
+  color: #ffffff;
+  border-radius: var(--cu-radius-md);
+  font-family: var(--cu-font-sans);
+  font-size: 0.84rem;
+  font-weight: 500;
+  box-shadow: var(--cu-shadow-lg);
+  z-index: 999999;
+  animation: cuToastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.cu-lms-toast.cu-toast-success {
+  background: #0f172a;
+  border-left: 4px solid var(--cu-success);
+}
+
+.cu-lms-toast.cu-toast-error {
+  background: #0f172a;
+  border-left: 4px solid var(--cu-primary);
+}
+
+@keyframes cuToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Ensure reading content is always selectable and copyable */
+#region-main,
+.resourcecontent,
+.activity-description,
+.generalbox {
+  -webkit-user-select: text !important;
+  user-select: text !important;
 }
 
 /* Feature 3: Hide & disable SOP popup and button permanently */
@@ -42,3 +305,221 @@ html[data-cu-hide-sop-permanently="true"] .ai-lib-fab {
   pointer-events: none !important;
   opacity: 0 !important;
 }
+
+/* ==========================================================================
+/* ==========================================================================
+   AI Quiz Auto-Solver Floating Control Widget (Retractable & Modern)
+   ========================================================================== */
+.cu-quiz-solver-widget {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 999990;
+  display: flex;
+  flex-direction: column;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: var(--cu-radius-lg);
+  box-shadow: 0 16px 32px -6px rgba(0, 0, 0, 0.45);
+  font-family: var(--cu-font-sans);
+  color: #f8fafc;
+  width: 290px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cu-quiz-solver-widget.cu-minimized {
+  width: auto;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cu-quiz-solver-widget.cu-minimized .cu-quiz-widget-body {
+  display: none !important;
+}
+
+.cu-quiz-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #182234;
+  border-bottom: 1px solid #334155;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cu-quiz-solver-widget.cu-minimized .cu-quiz-widget-header {
+  border-bottom: none;
+  padding: 6px 12px;
+  background: #0f172a;
+}
+
+.cu-quiz-header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #38bdf8;
+}
+
+.cu-quiz-header-badge {
+  font-size: 0.65rem;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.cu-quiz-header-minimize {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.cu-quiz-header-minimize:hover {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cu-quiz-widget-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+/* Quick Action Buttons */
+.cu-quiz-action-grid {
+  display: flex;
+  gap: 6px;
+}
+
+.cu-quiz-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--cu-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--cu-radius-sm);
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cu-quiz-btn:hover:not(:disabled) {
+  background: var(--cu-primary-hover);
+  transform: translateY(-1px);
+}
+
+.cu-quiz-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.cu-quiz-btn-secondary {
+  background: #334155;
+}
+
+.cu-quiz-btn-secondary:hover:not(:disabled) {
+  background: #475569;
+}
+
+.cu-quiz-btn-active {
+  background: #16a34a !important;
+  box-shadow: 0 0 10px rgba(22, 163, 74, 0.4);
+}
+
+/* Retractable In-Widget Settings Accordion */
+.cu-quiz-retract-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cu-quiz-retract-btn:hover {
+  background: #27354a;
+}
+
+.cu-quiz-retract-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.cu-quiz-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: #94a3b8;
+}
+
+.cu-quiz-select,
+.cu-quiz-input {
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid #475569;
+  border-radius: var(--cu-radius-sm);
+  padding: 4px 6px;
+  font-size: 0.74rem;
+  outline: none;
+  width: 155px;
+}
+
+.cu-quiz-input {
+  font-family: monospace;
+}
+
+.cu-quiz-select:focus,
+.cu-quiz-input:focus {
+  border-color: #38bdf8;
+}
+
+.cu-quiz-explanation-box {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: var(--cu-radius-sm);
+  padding: 6px 8px;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  max-height: 85px;
+  overflow-y: auto;
+  line-height: 1.35;
+}
+
+/* Highlighted Answer Option in Quiz */
+.cu-quiz-ai-highlighted {
+  border: 2px solid #22c55e !important;
+  background-color: rgba(34, 197, 94, 0.14) !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+
