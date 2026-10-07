@@ -1,6 +1,6 @@
-<p class="centered-text"># CU LMS Fixer & AI Quiz Solver 🚀 </p>   
-
 <div align="center">
+
+# CU LMS Fixer & AI Quiz Solver 🚀
 
 [![Visitors](https://komarev.com/ghpvc/?username=ankitpandeynine-cu-lms-fixer&color=blueviolet&style=flat-square&label=VISITORS)](https://github.com/ankitpandeynine/Cu-lms-fixer)
 [![GitHub Downloads](https://img.shields.io/github/downloads/ankitpandeynine/Cu-lms-fixer/total?color=blue&style=flat-square&logo=github&label=DOWNLOADS)](https://github.com/ankitpandeynine/Cu-lms-fixer/releases)
