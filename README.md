@@ -24,7 +24,7 @@ It combines **cutting-edge AI Quiz Solving** with **unrestricted copy-paste free
 
 ---
 
-## 🌟 Top 4 Features
+## 🌟 Top Features
 
 ### 1. ⚡ AI Quiz Auto-Solver & Auto-Proceed (Multi-LLM Engine)
 - **Instant Intelligent Answers**: Analyzes LMS quiz questions in real time using your choice of top-tier AI models (**Google Gemini**, **xAI Grok**, **NVIDIA NIM**, **OpenRouter**, or **Local LM Studio/Ollama**).
