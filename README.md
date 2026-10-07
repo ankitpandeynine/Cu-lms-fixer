@@ -1,4 +1,4 @@
-# CU LMS Fixer & AI Quiz Solver 🚀
+<p class="centered-text"># CU LMS Fixer & AI Quiz Solver 🚀 </p>   
 
 <div align="center">
 
