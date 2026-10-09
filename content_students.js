@@ -34,8 +34,8 @@ let autoLoginProcessedStep1 = false;
 function handleStudentAutoLogin() {
   if (!studentSettings.enableAutoLogin || !studentSettings.autoLoginUid) return;
 
-  const isLoginPage = location.pathname.toLowerCase().includes("login");
-  if (!isLoginPage) return;
+  const isLoginPage = location.pathname.toLowerCase().includes("login") || location.pathname === "/" || location.pathname.toLowerCase().includes("default");
+  if (!isLoginPage && !document.querySelector("input[type='password']")) return;
 
   // Step 1: User ID input field
   const uidInput = document.querySelector(
