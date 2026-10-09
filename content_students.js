@@ -14,6 +14,9 @@
 const STUDENTS_DEFAULT_SETTINGS = {
   hideStudentsOverlay: true,
   hideLandingSlideshow: true,
+  enableAutoLogin: false,
+  autoLoginUid: "",
+  autoLoginPassword: "",
 };
 
 const REQUIRED_FEEDBACK_PHRASES = [
@@ -26,6 +29,172 @@ const FORCED_OVERLAY_IDS = ["divforcepopup", "div_libpopup"];
 
 let studentSettings = { ...STUDENTS_DEFAULT_SETTINGS };
 let savedBodyLock = null;
+let autoLoginProcessedStep1 = false;
+
+function handleStudentAutoLogin() {
+  if (!studentSettings.enableAutoLogin || !studentSettings.autoLoginUid) return;
+
+  const isLoginPage = location.pathname.toLowerCase().includes("login");
+  if (!isLoginPage) return;
+
+  // Step 1: User ID input field
+  const uidInput = document.querySelector(
+    "input[placeholder*='User' i], input[id*='User' i], input[name*='User' i], input[id*='txtUser' i]"
+  );
+
+  if (uidInput && !autoLoginProcessedStep1) {
+    if (uidInput.value !== studentSettings.autoLoginUid) {
+      uidInput.value = studentSettings.autoLoginUid;
+      uidInput.dispatchEvent(new Event("input", { bubbles: true }));
+      uidInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    // Find NEXT button
+    const nextBtn =
+      document.querySelector("input[value*='NEXT' i], button[id*='btnNext' i], input[id*='btnNext' i]") ||
+      [...document.querySelectorAll("button, input[type='submit'], input[type='button'], .btn")].find(
+        (el) => (el.value || el.textContent || "").trim().toUpperCase() === "NEXT"
+      );
+
+    if (nextBtn) {
+      autoLoginProcessedStep1 = true;
+      setTimeout(() => {
+        try {
+          nextBtn.click();
+        } catch {}
+      }, 150);
+    }
+    return;
+  }
+
+  // Step 2: Password input field
+  const passInput = document.querySelector(
+    "input[type='password'], input[placeholder*='Password' i], input[id*='txtPassword' i]"
+  );
+
+  if (passInput && studentSettings.autoLoginPassword) {
+    if (passInput.value !== studentSettings.autoLoginPassword) {
+      passInput.value = studentSettings.autoLoginPassword;
+      passInput.dispatchEvent(new Event("input", { bubbles: true }));
+      passInput.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    // Focus CAPTCHA field automatically for fast manual entry
+    const captchaInput = document.querySelector(
+      "#txtcaptcha, input[placeholder*='captcha' i], input[id*='txtCaptcha' i], input[name*='txtCaptcha' i], input[id*='captcha' i]"
+    );
+    if (captchaInput && document.activeElement !== captchaInput) {
+      captchaInput.focus();
+    }
+
+    // Solve CAPTCHA using local Tesseract.js
+    const captchaImage = document.querySelector(".__captcha_value img, img[src*='captcha' i], img[id*='captcha' i], img[alt*='captcha' i]");
+    
+    if (!captchaImage) {
+      console.log("CU LMS Fixer: CAPTCHA image element not found on this page.");
+    } else {
+      console.log("CU LMS Fixer: Found CAPTCHA image, starting OCR...", captchaImage);
+      
+      // Prevent infinite loop if OCR fails and page doesn't fully reload
+      if (window._lastSolvedCaptchaSrc === captchaImage.src) {
+        console.log("CU LMS Fixer: This CAPTCHA failed previously. Clicking reload...");
+        const reloadBtn = document.querySelector("#lnkupCaptcha, .__captcha_reload");
+        if (reloadBtn) {
+          reloadBtn.click();
+        }
+        return;
+      }
+      window._lastSolvedCaptchaSrc = captchaImage.src;
+
+      if (!window.Tesseract) {
+        console.error("Tesseract.js is not loaded.");
+        return;
+      }
+
+      // Pre-process image to remove grid lines and improve OCR accuracy
+      const preprocessImage = (imgEl) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = imgEl.naturalWidth || imgEl.width || 120;
+        canvas.height = imgEl.naturalHeight || imgEl.height || 40;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+        
+        try {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          
+          // Apply luminance threshold to remove the light colored grid lines
+          // The text is very dark, the grid is light.
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
+            
+            // Calculate luminance
+            const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+            
+            // If pixel is darker than the threshold, make it pure black. Otherwise, pure white.
+            if (luminance < 120) {
+              data[i] = 0;     // R
+              data[i+1] = 0;   // G
+              data[i+2] = 0;   // B
+            } else {
+              data[i] = 255;   // R
+              data[i+1] = 255; // G
+              data[i+2] = 255; // B
+            }
+          }
+          
+          ctx.putImageData(imageData, 0, 0);
+          return canvas.toDataURL("image/png");
+        } catch (e) {
+          console.error("Canvas CORS issue:", e);
+          return imgEl.src; // Fallback to original if canvas gets tainted
+        }
+      };
+
+      // We need to wait for the image to be fully loaded before drawing it to canvas
+      const processCaptcha = () => {
+        const processedImageSrc = preprocessImage(captchaImage);
+        
+        Tesseract.recognize(
+          processedImageSrc,
+          'eng',
+          { logger: m => console.log(m) }
+        ).then(({ data: { text } }) => {
+          // Clean up output text (remove spaces, newlines, etc)
+          const cleanedText = text.replace(/[^A-Za-z0-9]/g, '');
+          console.log("Solved CAPTCHA:", cleanedText);
+          
+          captchaInput.value = cleanedText;
+          captchaInput.dispatchEvent(new Event("input", { bubbles: true }));
+          captchaInput.dispatchEvent(new Event("change", { bubbles: true }));
+          
+          // Auto submit the form
+          const loginBtn = document.querySelector("#btnLogin, input[type='submit'][value*='LOGIN' i], button[id*='Login' i]");
+          if (loginBtn) {
+            console.log("CU LMS Fixer: Auto-submitting form...");
+            setTimeout(() => {
+              loginBtn.click();
+            }, 300); // Small delay to let React/Angular/ASP.NET state catch up
+          } else if (captchaInput.form) {
+            captchaInput.form.submit();
+          }
+          
+        }).catch(error => {
+          console.error('Error solving CAPTCHA with Tesseract:', error);
+        });
+      };
+
+      if (captchaImage.complete) {
+        processCaptcha();
+      } else {
+        captchaImage.onload = processCaptcha;
+      }
+    }
+  }
+}
 
 // Track modals explicitly opened by user interaction
 const userOpenedModalIds = new Set();
@@ -352,6 +521,8 @@ function applyStudentSettings() {
 
   if (studentSettings.hideLandingSlideshow) hideSlideshowElements();
   else restoreSlideshowElements();
+
+  if (studentSettings.enableAutoLogin) handleStudentAutoLogin();
 }
 
 async function loadStudentSettings() {
@@ -375,6 +546,18 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     studentSettings.hideLandingSlideshow = changes.hideLandingSlideshow.newValue;
     changed = true;
   }
+  if (changes.enableAutoLogin) {
+    studentSettings.enableAutoLogin = changes.enableAutoLogin.newValue;
+    changed = true;
+  }
+  if (changes.autoLoginUid) {
+    studentSettings.autoLoginUid = changes.autoLoginUid.newValue;
+    changed = true;
+  }
+  if (changes.autoLoginPassword) {
+    studentSettings.autoLoginPassword = changes.autoLoginPassword.newValue;
+    changed = true;
+  }
   if (changed) {
     applyStudentSettings();
   }
@@ -385,6 +568,7 @@ loadStudentSettings();
 new MutationObserver(() => {
   if (studentSettings.hideStudentsOverlay) hideHomeOverlays();
   if (studentSettings.hideLandingSlideshow) hideSlideshowElements();
+  if (studentSettings.enableAutoLogin) handleStudentAutoLogin();
 }).observe(document.documentElement, { childList: true, subtree: true });
 
 // Check on delayed ASP.NET WebForms / jQuery timers
@@ -392,5 +576,6 @@ new MutationObserver(() => {
   window.setTimeout(() => {
     if (studentSettings.hideStudentsOverlay) hideHomeOverlays();
     if (studentSettings.hideLandingSlideshow) hideSlideshowElements();
+    if (studentSettings.enableAutoLogin) handleStudentAutoLogin();
   }, delay);
 });

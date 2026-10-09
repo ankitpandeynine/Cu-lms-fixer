@@ -75,7 +75,7 @@
         "https://uims.cuchd.in/*",
         "*://*.cuims.in/*"
       ],
-      "js": ["content_students.js"],
+      "js": ["tesseract.min.js", "content_students.js"],
       "css": ["content_students.css"],
       "run_at": "document_start"
     }

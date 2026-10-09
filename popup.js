@@ -5,6 +5,9 @@ const DEFAULT_SETTINGS = {
   enableSectionDownloadAll: true,
   enableQuizSolver: true,
   enableAutoProceed: false,
+  enableAutoLogin: false,
+  autoLoginUid: "",
+  autoLoginPassword: "",
   quizProvider: "gemini",
   geminiModel: "gemini-2.5-flash",
   geminiApiKey: "",
@@ -23,8 +26,10 @@ const DEFAULT_SETTINGS = {
 const elements = {
   tabBtnHome: document.getElementById("tabBtnHome"),
   tabBtnAi: document.getElementById("tabBtnAi"),
+  tabBtnLogin: document.getElementById("tabBtnLogin"),
   tabContentHome: document.getElementById("tabContentHome"),
   tabContentAi: document.getElementById("tabContentAi"),
+  tabContentLogin: document.getElementById("tabContentLogin"),
 
   enableUnblockCopyPaste: document.getElementById("enableUnblockCopyPaste"),
   enableDownloadButton: document.getElementById("enableDownloadButton"),
@@ -32,6 +37,9 @@ const elements = {
   enableSectionDownloadAll: document.getElementById("enableSectionDownloadAll"),
   enableQuizSolver: document.getElementById("enableQuizSolver"),
   enableAutoProceed: document.getElementById("enableAutoProceed"),
+  enableAutoLogin: document.getElementById("enableAutoLogin"),
+  autoLoginUidInput: document.getElementById("autoLoginUidInput"),
+  autoLoginPasswordInput: document.getElementById("autoLoginPasswordInput"),
   quizProviderSelect: document.getElementById("quizProviderSelect"),
 
   // Provider blocks
@@ -96,6 +104,15 @@ async function loadSettings() {
   if (elements.enableAutoProceed) {
     elements.enableAutoProceed.checked = Boolean(settings.enableAutoProceed);
   }
+  if (elements.enableAutoLogin) {
+    elements.enableAutoLogin.checked = Boolean(settings.enableAutoLogin);
+  }
+  if (elements.autoLoginUidInput) {
+    elements.autoLoginUidInput.value = settings.autoLoginUid || "";
+  }
+  if (elements.autoLoginPasswordInput) {
+    elements.autoLoginPasswordInput.value = settings.autoLoginPassword || "";
+  }
   if (elements.quizProviderSelect) {
     elements.quizProviderSelect.value = settings.quizProvider || "gemini";
     updateActiveProviderBlock(settings.quizProvider);
@@ -127,6 +144,9 @@ async function saveSettings() {
     enableSectionDownloadAll: elements.enableSectionDownloadAll ? elements.enableSectionDownloadAll.checked : true,
     enableQuizSolver: elements.enableQuizSolver ? elements.enableQuizSolver.checked : true,
     enableAutoProceed: elements.enableAutoProceed ? elements.enableAutoProceed.checked : false,
+    enableAutoLogin: elements.enableAutoLogin ? elements.enableAutoLogin.checked : false,
+    autoLoginUid: elements.autoLoginUidInput ? elements.autoLoginUidInput.value.trim() : "",
+    autoLoginPassword: elements.autoLoginPasswordInput ? elements.autoLoginPasswordInput.value.trim() : "",
     quizProvider: elements.quizProviderSelect ? elements.quizProviderSelect.value : "gemini",
 
     geminiModel: elements.geminiModelSelect ? elements.geminiModelSelect.value : "gemini-2.5-flash",
@@ -150,25 +170,28 @@ async function saveSettings() {
 
 function initListeners() {
   // iOS 27 Segmented Tab Switching
-  if (elements.tabBtnHome && elements.tabBtnAi) {
-    elements.tabBtnHome.addEventListener("click", () => {
-      elements.tabBtnHome.classList.add("active");
-      elements.tabBtnAi.classList.remove("active");
-      elements.tabBtnHome.setAttribute("aria-selected", "true");
-      elements.tabBtnAi.setAttribute("aria-selected", "false");
-      elements.tabContentHome.style.display = "flex";
-      elements.tabContentAi.style.display = "none";
-    });
+  const tabs = [
+    { btn: elements.tabBtnHome, content: elements.tabContentHome },
+    { btn: elements.tabBtnAi, content: elements.tabContentAi },
+    { btn: elements.tabBtnLogin, content: elements.tabContentLogin }
+  ];
 
-    elements.tabBtnAi.addEventListener("click", () => {
-      elements.tabBtnAi.classList.add("active");
-      elements.tabBtnHome.classList.remove("active");
-      elements.tabBtnAi.setAttribute("aria-selected", "true");
-      elements.tabBtnHome.setAttribute("aria-selected", "false");
-      elements.tabContentAi.style.display = "flex";
-      elements.tabContentHome.style.display = "none";
-    });
-  }
+  tabs.forEach(tab => {
+    if (tab.btn && tab.content) {
+      tab.btn.addEventListener("click", () => {
+        tabs.forEach(t => {
+          if (t.btn && t.content) {
+            t.btn.classList.remove("active");
+            t.btn.setAttribute("aria-selected", "false");
+            t.content.style.display = "none";
+          }
+        });
+        tab.btn.classList.add("active");
+        tab.btn.setAttribute("aria-selected", "true");
+        tab.content.style.display = "flex";
+      });
+    }
+  });
 
   // Provider change
   if (elements.quizProviderSelect) {
@@ -207,9 +230,13 @@ function initListeners() {
   if (elements.enableAutoProceed) {
     elements.enableAutoProceed.addEventListener("change", saveSettings);
   }
+  if (elements.enableAutoLogin) {
+    elements.enableAutoLogin.addEventListener("change", saveSettings);
+  }
 
   // Input listeners
   const inputElements = [
+    elements.autoLoginUidInput, elements.autoLoginPasswordInput,
     elements.geminiModelSelect, elements.geminiApiKeyInput,
     elements.grokModelSelect, elements.grokApiKeyInput,
     elements.nvidiaModelSelect, elements.nvidiaApiKeyInput,
