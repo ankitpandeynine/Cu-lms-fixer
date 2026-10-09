@@ -73,6 +73,11 @@ It combines **cutting-edge AI Quiz Solving** with **unrestricted copy-paste free
 5. **Pin and Enjoy**:
    - Click the extensions puzzle icon (🧩) and pin **CU LMS Fixer**.
 
+### 🔄 1-Click Auto Updates (Zero Hassle)
+- Whenever a new version or commit is pushed to GitHub, the extension automatically displays a glowing **"New Update Available!"** notification banner in the popup with the release notes and a badge on your extension icon.
+- Click **⚡ 1-Click Update & Refresh**: the updater engine downloads the latest archive, unpacks the files, and reloads the extension instantly.
+- **Zero Data Loss Guarantee**: All your saved Student Portal credentials (UID, Password), AI model selections, and API keys (Gemini, Grok, NVIDIA, OpenRouter) are automatically backed up and 100% preserved.
+
 ---
 
 ### Part 2: Start the AI Solver Backend (For Quiz Solving)

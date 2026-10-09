@@ -87,11 +87,146 @@ function triggerDownload(fileUrl, filename) {
   });
 }
 
+function isAllowedSender(sender) {
+  if (!sender || !sender.tab?.url) return true; // extension internal or popup
+  const url = sender.tab.url;
+  if (url.startsWith("chrome-extension://")) return true;
+  return isAllowedOrigin(url);
+}
+
+// ============================================================================
+// GITHUB AUTO-UPDATE DETECTOR & SCHEDULER
+// ============================================================================
+const GITHUB_REPO_PATH = "ankitpandeynine/Cu-lms-fixer";
+const GITHUB_BRANCH_NAME = "main";
+
+async function checkForGitHubUpdate() {
+  try {
+    const localStored = await chrome.storage.local.get(["installedCommit"]);
+    let localCommit = localStored.installedCommit;
+
+    if (!localCommit) {
+      try {
+        const vRes = await fetch(chrome.runtime.getURL("version.json"));
+        const vJson = await vRes.json();
+        if (vJson.commit) localCommit = vJson.commit;
+      } catch (e) {}
+    }
+
+    const manifest = chrome.runtime.getManifest();
+    const currentVer = manifest.version;
+
+    const resp = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO_PATH}/commits/${GITHUB_BRANCH_NAME}`,
+      {
+        headers: { Accept: "application/vnd.github.v3+json" },
+        cache: "no-store",
+      }
+    );
+
+    if (!resp.ok) {
+      console.warn("[CU-LMS BG] GitHub commit check returned HTTP", resp.status);
+      return { error: `HTTP ${resp.status}`, updateAvailable: false };
+    }
+
+    const data = await resp.json();
+    const remoteSha = data.sha || "";
+    const remoteMsg = data.commit?.message?.split("\n")[0] || "";
+    const remoteDate = data.commit?.author?.date || "";
+
+    // Check remote manifest version
+    let remoteVersion = currentVer;
+    try {
+      const mResp = await fetch(
+        `https://raw.githubusercontent.com/${GITHUB_REPO_PATH}/${GITHUB_BRANCH_NAME}/manifest.json`,
+        { cache: "no-store" }
+      );
+      if (mResp.ok) {
+        const mData = await mResp.json();
+        if (mData.version) remoteVersion = mData.version;
+      }
+    } catch (e) {}
+
+    // Initialize local commit on first run if missing
+    if (!localCommit && remoteSha) {
+      localCommit = remoteSha.slice(0, 7);
+      await chrome.storage.local.set({ installedCommit: localCommit });
+    }
+
+    const isUpdateAvailable = Boolean(
+      remoteSha &&
+      localCommit &&
+      !remoteSha.startsWith(localCommit.slice(0, 7))
+    );
+
+    await chrome.storage.local.set({
+      updateAvailable: isUpdateAvailable,
+      remoteCommit: remoteSha,
+      remoteCommitMsg: remoteMsg,
+      remoteCommitDate: remoteDate,
+      remoteVersion: remoteVersion,
+      lastUpdateCheckTime: Date.now(),
+    });
+
+    if (isUpdateAvailable) {
+      chrome.action.setBadgeText({ text: "NEW" });
+      chrome.action.setBadgeBackgroundColor({ color: "#2563eb" });
+      console.log(
+        `[CU-LMS BG] Update available: ${remoteSha.slice(0, 7)} - "${remoteMsg}"`
+      );
+    } else {
+      chrome.action.setBadgeText({ text: "" });
+    }
+
+    return {
+      updateAvailable: isUpdateAvailable,
+      localCommit: localCommit ? localCommit.slice(0, 7) : "",
+      remoteCommit: remoteSha ? remoteSha.slice(0, 7) : "",
+      remoteCommitMsg: remoteMsg,
+      remoteVersion,
+      currentVersion: currentVer,
+    };
+  } catch (err) {
+    console.error("[CU-LMS BG] Update check failed:", err);
+    return { error: err.message, updateAvailable: false };
+  }
+}
+
+// Schedule update checks every 30 minutes and run on startup
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.alarms.create("check_extension_updates", { periodInMinutes: 30 });
+  checkForGitHubUpdate();
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  checkForGitHubUpdate();
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "check_extension_updates") {
+    checkForGitHubUpdate();
+  }
+});
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Validate sender origin if sender tab is present
-  if (sender.tab?.url && !isAllowedOrigin(sender.tab.url)) {
+  if (!isAllowedSender(sender)) {
     sendResponse({ ok: false, error: "Unauthorized sender origin." });
     return false;
+  }
+
+  if (message?.type === "CHECK_FOR_UPDATES") {
+    (async () => {
+      const info = await checkForGitHubUpdate();
+      sendResponse(info);
+    })();
+    return true;
+  }
+
+  if (message?.type === "RELOAD_EXTENSION") {
+    chrome.runtime.reload();
+    sendResponse({ ok: true });
+    return true;
   }
 
   if (message?.type === "download-file") {

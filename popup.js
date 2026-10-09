@@ -65,6 +65,15 @@ const elements = {
   saveStatus: document.getElementById("saveStatus"),
   footerCredit: document.getElementById("footerCredit"),
   githubLink: document.getElementById("githubLink"),
+
+  // Update elements
+  updateBanner: document.getElementById("updateBanner"),
+  updateVersionBadge: document.getElementById("updateVersionBadge"),
+  updateCommitMsg: document.getElementById("updateCommitMsg"),
+  btnOneClickUpdate: document.getElementById("btnOneClickUpdate"),
+  checkUpdatesBtn: document.getElementById("checkUpdatesBtn"),
+  checkUpdatesIcon: document.getElementById("checkUpdatesIcon"),
+  checkUpdatesText: document.getElementById("checkUpdatesText"),
 };
 
 let saveTimeout = null;
@@ -259,9 +268,98 @@ function initListeners() {
       chrome.tabs.create({ url: elements.githubLink.href });
     });
   }
+
+  // 1-Click Update Button Click -> Opens updater.html?auto=1
+  if (elements.btnOneClickUpdate) {
+    elements.btnOneClickUpdate.addEventListener("click", () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL("updater.html?auto=1") });
+      window.close();
+    });
+  }
+
+  // Manual Check Updates in Footer
+  if (elements.checkUpdatesBtn) {
+    elements.checkUpdatesBtn.addEventListener("click", () => {
+      if (elements.checkUpdatesBtn.classList.contains("checking")) return;
+      elements.checkUpdatesBtn.classList.add("checking");
+      if (elements.checkUpdatesText) elements.checkUpdatesText.textContent = "Checking...";
+
+      chrome.runtime.sendMessage({ type: "CHECK_FOR_UPDATES" }, (response) => {
+        chrome.storage.local.get(
+          ["updateAvailable", "remoteCommit", "remoteCommitMsg", "remoteVersion", "installedCommit"],
+          (data) => {
+            refreshUpdateUI(data);
+            elements.checkUpdatesBtn.classList.remove("checking");
+            if (elements.checkUpdatesText) {
+              if (response?.updateAvailable) {
+                elements.checkUpdatesText.textContent = "New Update!";
+                elements.checkUpdatesBtn.style.color = "#38bdf8";
+              } else {
+                elements.checkUpdatesText.textContent = "Latest ✓";
+                elements.checkUpdatesBtn.style.color = "#34d399";
+              }
+              setTimeout(() => {
+                elements.checkUpdatesText.textContent = "Updates";
+                elements.checkUpdatesBtn.style.color = "";
+              }, 3000);
+            }
+          }
+        );
+      });
+    });
+  }
+}
+
+function refreshUpdateUI(storageData) {
+  if (!elements.updateBanner || !storageData) return;
+  const isAvailable = Boolean(storageData.updateAvailable);
+  const remoteSha = storageData.remoteCommit || "";
+  const localSha = storageData.installedCommit || "";
+  const remoteVer = storageData.remoteVersion || "";
+  const msg = storageData.remoteCommitMsg || "New enhancements and fixes released on GitHub";
+
+  // Only display if update is available and remote commit is different from installed
+  if (isAvailable && (!localSha || !remoteSha.startsWith(localSha.slice(0, 7)))) {
+    elements.updateBanner.style.display = "block";
+    if (elements.updateVersionBadge) {
+      elements.updateVersionBadge.textContent = remoteVer
+        ? `v${remoteVer}`
+        : (remoteSha ? remoteSha.slice(0, 7) : "NEW");
+    }
+    if (elements.updateCommitMsg) {
+      elements.updateCommitMsg.textContent = msg;
+    }
+  } else {
+    elements.updateBanner.style.display = "none";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadSettings();
   initListeners();
+
+  // Load update state from local storage
+  chrome.storage.local.get(
+    ["updateAvailable", "remoteCommit", "remoteCommitMsg", "remoteVersion", "installedCommit"],
+    (res) => {
+      refreshUpdateUI(res);
+    }
+  );
+
+  // Listen for background update changes
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && (changes.updateAvailable || changes.remoteCommit || changes.installedCommit)) {
+      chrome.storage.local.get(
+        ["updateAvailable", "remoteCommit", "remoteCommitMsg", "remoteVersion", "installedCommit"],
+        (res) => {
+          refreshUpdateUI(res);
+        }
+      );
+    }
+  });
+
+  // Query background for latest update check in background
+  chrome.runtime.sendMessage({ type: "CHECK_FOR_UPDATES" }, (res) => {
+    if (res) refreshUpdateUI(res);
+  });
 });

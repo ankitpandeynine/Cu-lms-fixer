@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CU LMS Fixer - 1-Click Auto Updater</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 580px;
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.15);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 20px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    .title-wrap h1 {
+      font-size: 21px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .title-wrap p {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* Version Comparison Card */
+    .version-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .ver-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ver-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .ver-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f8fafc;
+      font-family: ui-monospace, Menlo, Monaco, monospace;
+    }
+
+    .ver-val.highlight {
+      color: #38bdf8;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+
+    .ver-divider {
+      font-size: 22px;
+      color: #475569;
+    }
+
+    /* Commit message */
+    .commit-box {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      font-size: 13.5px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .commit-box strong {
+      color: #60a5fa;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    /* Progress bar */
+    .progress-section {
+      margin-bottom: 24px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2563eb, #38bdf8, #10b981);
+      border-radius: 999px;
+      transition: width 0.35s ease;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
+    }
+
+    .progress-status {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+
+    /* Action buttons */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1.5px);
+      box-shadow: 0 6px 22px rgba(37, 99, 235, 0.55);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.6);
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .btn-secondary:hover {
+      background: rgba(30, 41, 59, 0.8);
+      color: #f8fafc;
+    }
+
+    /* Logs view */
+    .log-box {
+      background: rgba(11, 17, 32, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      font-family: ui-monospace, Menlo, Monaco, monospace;
+      font-size: 11.5px;
+      color: #94a3b8;
+      max-height: 140px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+    .log-box .log-entry { margin-bottom: 3px; }
+    .log-box .log-entry.success { color: #34d399; }
+    .log-box .log-entry.warn { color: #fbbf24; }
+    .log-box .log-entry.error { color: #f87171; }
+
+    /* Security Notice */
+    .security-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      color: #64748b;
+      justify-content: center;
+      margin-top: 16px;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .security-badge svg {
+      color: #34d399;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="icons/icon-48.png" alt="Logo" class="logo">
+      <div class="title-wrap">
+        <h1>🚀 CU LMS Fixer 1-Click Updater</h1>
+        <p>Instant Auto-Sync, Code Update & Extension Reload</p>
+      </div>
+    </div>
+
+    <!-- Version comparison -->
+    <div class="version-card">
+      <div class="ver-col">
+        <span class="ver-label">Current Installed</span>
+        <span id="currentVerText" class="ver-val">Loading...</span>
+      </div>
+      <div class="ver-divider">→</div>
+      <div class="ver-col" style="text-align: right;">
+        <span class="ver-label">Latest on GitHub</span>
+        <span id="latestVerText" class="ver-val highlight">Checking...</span>
+      </div>
+    </div>
+
+    <!-- Commit detail box -->
+    <div id="commitBox" class="commit-box" style="display: none;">
+      <strong>Latest Commit Update:</strong>
+      <span id="commitMsgText">Fetching commit info...</span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-bar-bg">
+        <div id="progressBarFill" class="progress-bar-fill"></div>
+      </div>
+      <div class="progress-status">
+        <span id="progressStepText">Ready to check for updates</span>
+        <span id="progressPercentText">0%</span>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-group">
+      <button id="startUpdateBtn" class="btn btn-primary">
+        <span>⚡ 1-Click Update Now</span>
+      </button>
+      <button id="downloadZipBtn" class="btn btn-secondary">
+        <span>📥 Download Latest Zip (Manual Fallback)</span>
+      </button>
+    </div>
+
+    <!-- Live Log Console -->
+    <div id="logBox" class="log-box">
+      <div class="log-entry">Connecting to CU LMS Fixer updater engine...</div>
+    </div>
+
+    <div class="security-badge">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span>Data Safety Guarantee: UID, Password, AI API keys, and all preferences are 100% saved and preserved.</span>
+    </div>
+  </div>
+
+  <script src="fflate.js"></script>
+  <script src="updater.js"></script>
+</body>
+</html>
