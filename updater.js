@@ -13,7 +13,7 @@ const GITHUB_ZIP_URL = `https://codeload.github.com/${GITHUB_REPO}/zip/refs/head
 const DB_NAME = "CuLmsFixerDB";
 const DB_STORE = "handles";
 
-let currentLocalCommit = "f0c8069";
+let currentLocalCommit = "b8947cc";
 let remoteCommitSha = "";
 let remoteCommitMsg = "";
 let remoteCommitDate = "";
